@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package ozonmp.trv_airport_api.v1;
+
+import "validate/validate.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/ozonmp/trv-airport-api/pkg/trv-airport-api;trv_airport_api";
+
+service TrvAirportApiService {
+  rpc CreateAirportV1 (CreateAirportV1Request) returns (CreateAirportV1Response){
+    option (google.api.http) = {
+      post: "/v1/airports"
+      body: "*"
+    };
+  }
+  rpc DescribeAirportV1(DescribeAirportV1Request) returns (DescribeAirportV1Response) {
+    option (google.api.http) = {
+      get: "/v1/airports/{airport_id}"
+    };
+  }
+
+  rpc ListAirportsV1(ListAirportsV1Request) returns (ListAirportsV1Response) {
+    option (google.api.http) = {
+      get: "/v1/airports"
+    };
+  }
+
+  rpc DeleteAirportV1(DeleteAirportV1Request) returns (DeleteAirportV1Response){
+    option (google.api.http) = {
+      delete: "/v1/airports"
+    };
+  }
+}
+
+message Airport {
+  uint64 id = 1;
+  string name = 2;
+  string location = 3;
+
+}
+
+message CreateAirportV1Request {
+  string name = 1 [(validate.rules).string.len = 3];
+  string location = 2 [(validate.rules).string.min_len = 2, (validate.rules).string.max_len = 255];
+}
+message CreateAirportV1Response {
+  uint64 id = 1;
+}
+
+message DescribeAirportV1Request {
+  uint64 airport_id = 1 [(validate.rules).uint64.gt = 0];
+}
+message DescribeAirportV1Response {
+  Airport value = 1;
+}
+
+message ListAirportsV1Request {
+  uint64 cursor = 1;
+  uint64 limit = 2;
+
+}
+message  ListAirportsV1Response {
+  repeated Airport airports = 1;
+}
+
+message DeleteAirportV1Request {
+  uint64 airport_id = 1 [(validate.rules).uint64.gt = 0];
+}
+message DeleteAirportV1Response {
+  uint64 airport_id = 1;
+}
